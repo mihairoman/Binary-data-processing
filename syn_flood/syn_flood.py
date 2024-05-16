@@ -7,12 +7,12 @@ Pcap file structure:
 ┌──────────────────────────────────────────────┐
 │                pcap header                   │ 24 bytes
 ├──────────────────────────────────────────────┤
-│ per_packet_header (pcap_sf_pkthdr) 16 bytes  │   
+│ per_packet_header (pcap_sf_pkthdr)           │ 16 bytes  
 │ ───────────────────────────────────────────  │
 │ packet_data                                  │       
-│   ll_header                                  │       
-│   ip_header                                  │         
-│   tcp_header                                 │            
+│   ll_header                                  │ 4 bytes      
+│   ip_header                                  │ 20 bytes (without options)
+│   tcp_header                                 │ 20 bytes (without options)          
 ├──────────────────────────────────────────────┤
 │ per_packet_header (pcap_sf_pkthdr) 16 bytes  │   
 │ ───────────────────────────────────────────  │
@@ -51,7 +51,7 @@ with open('./synflood.pcap', 'rb') as file:
     assert ip_version == 4 # ipv4
     assert internet_header_length == 5 # 5 * 4 bytes = 20 bytes for ipv4 header without options
 
-    tcp_header = packet[24:38]
+    tcp_header = packet[24:38] # read until the flags
     source_port, dest_port, _, _, flags = struct.unpack('!HHIIH', tcp_header)
 
     syn_flag = (flags & 0x02) > 0
